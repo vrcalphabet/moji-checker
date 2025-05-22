@@ -22,11 +22,14 @@ export class InputManager {
   deleteAll() {
     this.domChangeObserver.reset();
     this.proxies.forEach((proxy) => {
-      if (proxy.intersectionObserver) {
-        proxy.intersectionObserver.disconnect();
+      if (proxy.resizeObserver) {
+        proxy.resizeObserver.unobserve(proxy.target!);
+      }
+      if (proxy.layer) {
+        proxy.layer.remove();
       }
     });
-    this.proxies = [];
+    this.proxies.length = 0;
   }
 
   /** 指定したセレクタに対してプロキシの基盤を作成 */
@@ -86,7 +89,7 @@ export class InputManager {
     };
     const callback: IntersectionObserverCallback = ([entry]) => {
       if (entry.isIntersecting) {
-        this.create(refProxy);
+        this.create(refProxy)
         observer.unobserve(refProxy.target!);
         refProxy.intersectionObserver = null;
       }
@@ -109,6 +112,11 @@ export class InputManager {
     backgroundLayer.className = '__MC__highlight-layer';
     refProxy.target.after(backgroundLayer);
     refProxy.layer = backgroundLayer;
+    
+    // テキストエリアの色を戻す
+    refProxy.target!.style.color = '';
+    // 色のイージングを無くす
+    refProxy.target!.style.transition = 'none';
 
     // テキストエリアの位置とサイズ等を取得
     const top = refProxy.target.offsetTop;
@@ -132,6 +140,7 @@ export class InputManager {
 
     // テキストエリアの色を変更
     refProxy.target.style.color = 'transparent';
+    refProxy.target.style.transition = '';
 
     // テキストエリアの高さ変更を監視
     const observer = new ResizeObserver(() => {
