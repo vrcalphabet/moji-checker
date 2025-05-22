@@ -127,6 +127,8 @@ export class InputManager {
     backgroundLayer.style.height = `${height}px`;
     backgroundLayer.style.padding = style.padding;
     backgroundLayer.style.color = style.color;
+    backgroundLayer.style.lineHeight = style.lineHeight;
+    backgroundLayer.style.fontSize = style.fontSize;
 
     // テキストエリアの色を変更
     refProxy.target.style.color = 'transparent';
