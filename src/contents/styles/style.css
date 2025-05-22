@@ -1,0 +1,22 @@
+div:has(> .__MC__target-layer) {
+  position: relative;
+}
+.__MC__target-layer {
+  caret-color: white;
+}
+.__MC__target-layer::selection {
+  color: transparent !important;
+  background-color: rgba(0, 0, 255, 0.6);
+}
+.__MC__highlight-layer {
+  position: absolute;
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  pointer-events: none;
+}
+.__MC__color-red {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+.__MC__color-yellow {
+  background-color: rgba(255, 255, 0, 0.5);
+}
