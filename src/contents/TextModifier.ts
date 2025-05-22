@@ -76,7 +76,9 @@ export class TextModifier {
     }
 
     // 最後のバッファを追加
-    this.pushText(layer, buffer, state);
+    if (buffer) {
+      this.pushText(layer, buffer, state);
+    }
   }
 
   /** 空白をチェックする */
@@ -101,6 +103,10 @@ export class TextModifier {
     if (!text) return;
 
     if (state === VariationType.PRESERVE) {
+      // textが改行のみの場合、そのまま追加できないので置換する
+      if (text === '\n') {
+        text = ' \n';
+      }
       // 保持される場合は普通にテキストを追加
       const textNode = document.createTextNode(text);
       layer.append(textNode);
