@@ -49,7 +49,7 @@ export class InputManager {
   }
 
   /** セレクタが存在するかを確認 */
-  findTarget(refProxy: InputProxy) {
+  private findTarget(refProxy: InputProxy) {
     // 要素が追加されるまで監視を開始
     this.domChangeObserver.add(refProxy.selector, (action, target) => {
       if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) {
@@ -81,7 +81,7 @@ export class InputManager {
   }
 
   /** 要素が画面内に表示されるまで待機（画面外の場合は正確な大きさが取得できないため） */
-  waitUntilVisible(refProxy: InputProxy) {
+  private waitUntilVisible(refProxy: InputProxy) {
     // 要素が表示されるまで待機
     const options = {
       rootMargin: '0px',
@@ -101,7 +101,7 @@ export class InputManager {
   }
 
   /** レイヤーを作成 */
-  create(refProxy: InputProxy) {
+  private create(refProxy: InputProxy) {
     if (!refProxy.target) return;
     
     // ターゲットレイヤーにクラス割り当て
