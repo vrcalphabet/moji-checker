@@ -1,5 +1,6 @@
 import { DOMChangeObserver } from './DOMChangeObserver';
 import { TextModifier } from './TextModifier';
+import { WindowResizeObserver } from './WindowResizeObserver';
 
 export interface InputProxy {
   selector: string;
@@ -7,15 +8,18 @@ export interface InputProxy {
   resizeObserver: ResizeObserver | null;
   layer: HTMLElement | null;
   target: HTMLInputElement | HTMLTextAreaElement | null;
+  windowResizeObserver: (() => void) | null;
 }
 
 export class InputManager {
   private proxies: InputProxy[];
   private domChangeObserver: DOMChangeObserver;
+  private windowResizeObserver: WindowResizeObserver;
 
   constructor() {
     this.proxies = [];
     this.domChangeObserver = new DOMChangeObserver();
+    this.windowResizeObserver = new WindowResizeObserver();
   }
 
   /** 全てのプロキシを削除 */
@@ -27,6 +31,9 @@ export class InputManager {
       }
       if (proxy.layer) {
         proxy.layer.remove();
+      }
+      if (proxy.windowResizeObserver) {
+        this.windowResizeObserver.unobserve(proxy.windowResizeObserver);
       }
     });
     this.proxies.length = 0;
@@ -42,6 +49,7 @@ export class InputManager {
       resizeObserver: null,
       layer: null,
       target: null,
+      windowResizeObserver: null,
     };
     this.proxies.push(refProxy);
 
@@ -113,34 +121,14 @@ export class InputManager {
     refProxy.target.after(backgroundLayer);
     refProxy.layer = backgroundLayer;
     
-    // テキストエリアの色を戻す
-    refProxy.target!.style.color = '';
-    // 色のイージングを無くす
-    refProxy.target!.style.transition = 'none';
-
-    // テキストエリアの位置とサイズ等を取得
-    const top = refProxy.target.offsetTop;
-    const right =
-      refProxy.target.parentElement!.clientWidth -
-      refProxy.target.offsetLeft -
-      refProxy.target.clientWidth;
-    const width = refProxy.target.clientWidth;
-    const height = refProxy.target.clientHeight;
-    const style = getComputedStyle(refProxy.target);
-
-    // テキストエリアの位置とサイズ等をバックグラウンドレイヤに設定
-    backgroundLayer.style.top = `${top}px`;
-    backgroundLayer.style.right = `${right}px`;
-    backgroundLayer.style.width = `${width}px`;
-    backgroundLayer.style.height = `${height}px`;
-    backgroundLayer.style.padding = style.padding;
-    backgroundLayer.style.color = style.color;
-    backgroundLayer.style.lineHeight = style.lineHeight;
-    backgroundLayer.style.fontSize = style.fontSize;
-
-    // テキストエリアの色を変更
-    refProxy.target.style.color = 'transparent';
-    refProxy.target.style.transition = '';
+    // 画面リサイズを監視
+    refProxy.windowResizeObserver = () => {
+      this.setStyle(refProxy);
+    };
+    this.windowResizeObserver.observe(refProxy.windowResizeObserver);
+    
+    // スタイルを設定
+    this.setStyle(refProxy);
 
     // テキストエリアの高さ変更を監視
     const observer = new ResizeObserver(() => {
@@ -166,5 +154,38 @@ export class InputManager {
 
     // 初期値をバックグラウンドレイヤに設定
     TextModifier.highlight(backgroundLayer, refProxy.target.value);
+  }
+  
+  private setStyle(refProxy: InputProxy) {
+    if (!refProxy.target || !refProxy.layer) return;
+    
+    // テキストエリアの色を戻す
+    refProxy.target.style.color = '';
+    // 色のイージングを無くす
+    refProxy.target.style.transition = 'none';
+
+    // テキストエリアの位置とサイズ等を取得
+    const top = refProxy.target.offsetTop;
+    const right =
+      refProxy.target.parentElement!.clientWidth -
+      refProxy.target.offsetLeft -
+      refProxy.target.clientWidth;
+    const width = refProxy.target.clientWidth;
+    const height = refProxy.target.clientHeight;
+    const style = getComputedStyle(refProxy.target);
+
+    // テキストエリアの位置とサイズ等をバックグラウンドレイヤに設定
+    refProxy.layer.style.top = `${top}px`;
+    refProxy.layer.style.right = `${right}px`;
+    refProxy.layer.style.width = `${width}px`;
+    refProxy.layer.style.height = `${height}px`;
+    refProxy.layer.style.padding = style.padding;
+    refProxy.layer.style.color = style.color;
+    refProxy.layer.style.lineHeight = style.lineHeight;
+    refProxy.layer.style.fontSize = style.fontSize;
+
+    // テキストエリアの色を変更
+    refProxy.target.style.color = 'transparent';
+    refProxy.target.style.transition = '';
   }
 }
