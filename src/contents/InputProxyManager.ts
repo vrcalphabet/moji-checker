@@ -97,7 +97,7 @@ export class InputManager {
     };
     const callback: IntersectionObserverCallback = ([entry]) => {
       if (entry.isIntersecting) {
-        this.create(refProxy)
+        this.create(refProxy);
         observer.unobserve(refProxy.target!);
         refProxy.intersectionObserver = null;
       }
@@ -111,54 +111,57 @@ export class InputManager {
   /** レイヤーを作成 */
   private create(refProxy: InputProxy) {
     if (!refProxy.target) return;
-    
-    // ターゲットレイヤーにクラス割り当て
-    refProxy.target.classList.add('__MC__target-layer');
 
-    // バックグラウンドレイヤを作成
-    const backgroundLayer = document.createElement('div');
-    backgroundLayer.className = '__MC__highlight-layer';
-    refProxy.target.after(backgroundLayer);
-    refProxy.layer = backgroundLayer;
-    
+    // ターゲットがすでにレイヤーを持っているか確認
+    const nextSibling = refProxy.target.nextElementSibling;
+    if (!(nextSibling && nextSibling.classList.contains('__MC__highlight-layer'))) {
+      // ターゲットレイヤーにクラス割り当て
+      refProxy.target.classList.add('__MC__target-layer');
+
+      // バックグラウンドレイヤを作成
+      const backgroundLayer = document.createElement('div');
+      backgroundLayer.className = '__MC__highlight-layer';
+      refProxy.target.after(backgroundLayer);
+      refProxy.layer = backgroundLayer;
+    }
+
     // 画面リサイズを監視
     refProxy.windowResizeObserver = () => {
       this.setStyle(refProxy);
     };
     this.windowResizeObserver.observe(refProxy.windowResizeObserver);
-    
+
     // スタイルを設定
     this.setStyle(refProxy);
 
     // テキストエリアの高さ変更を監視
     const observer = new ResizeObserver(() => {
       if (!refProxy.target) return;
-      
+
       // テキストエリアの高さを取得
       const height = refProxy.target.clientHeight;
 
       // バックグラウンドレイヤの高さを更新
-      backgroundLayer.style.height = `${height}px`;
+      refProxy.layer!.style.height = `${height}px`;
     });
     observer.observe(refProxy.target);
     refProxy.resizeObserver = observer;
-    // console.log('ResizeObserver created:', refProxy);
 
     // テキストエリアのスクロールを監視
     refProxy.target.addEventListener('scroll', () => {
       if (!refProxy.target) return;
-      
+
       // バックグラウンドレイヤのスクロール位置を更新
-      backgroundLayer.scrollTop = refProxy.target.scrollTop;
+      refProxy.layer!.scrollTop = refProxy.target.scrollTop;
     });
 
     // 初期値をバックグラウンドレイヤに設定
-    TextModifier.highlight(backgroundLayer, refProxy.target.value);
+    TextModifier.highlight(refProxy.layer!, refProxy.target.value);
   }
-  
+
   private setStyle(refProxy: InputProxy) {
     if (!refProxy.target || !refProxy.layer) return;
-    
+
     // テキストエリアの色を戻す
     refProxy.target.style.color = '';
     // 色のイージングを無くす

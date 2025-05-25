@@ -6,25 +6,29 @@ import type { PageTransitionObserverCallback } from './PageTransitionObserver';
 function main() {
   const inputManager = new InputManager();
   const handlePageChange: PageTransitionObserverCallback = (path) => {
-    inputManager.deleteAll();
+    setTimeout(() => {
+      inputManager.deleteAll();
 
-    if (path.match(/^\/home\/user\//)) {
-      // console.log('User profile page detected');
-      inputManager.createProxy("#User\\'s\\ Note"); // メモ
-      inputManager.createProxy('#input-status-message'); // ステータス
-      inputManager.createProxy('#textarea-bio'); // 自己紹介
-      inputManager.createProxy('#input-pronouns-text'); // 代名詞
-    } else if (path.match(/^\/home\/group\/.+\/posts/)) {
-      // console.log('Group posts page detected');
-      inputManager.createProxy('.home-content .e1buxcrw1'); // 投稿タイトル
-      inputManager.createProxy('.home-content .e1azh1061[name=post]'); // 投稿本文
-    } else if (path.match(/^\/home\/group\/.+\/galleries/)) {
-      // console.log('Group gallery page detected');
-      inputManager.createProxy('.home-content .e18c1r7j39 > label .e1buxcrw1[name=name]'); // ギャラリータイトル
-      inputManager.createProxy('.home-content .e18c1r7j39 > label .e1buxcrw1[name=description]'); // ギャラリー本文
-      inputManager.createProxy('.home-content .e18c1r7j39 > .e18c1r7j43 .e1buxcrw1[name=name]'); // ギャラリータイトル（変更）
-      inputManager.createProxy('.home-content .e18c1r7j39 > .e18c1r7j43 .e1buxcrw1[name=description]'); // ギャラリー本文（変更）
-    }
+      if (path.match(/^\/home\/user\//)) {
+        // console.log('User profile page detected');
+        inputManager.createProxy("#User\\'s\\ Note"); // メモ
+        inputManager.createProxy('#input-status-message'); // ステータス
+        inputManager.createProxy('#textarea-bio'); // 自己紹介
+        inputManager.createProxy('#input-pronouns-text'); // 代名詞
+      } else if (path.match(/^\/home\/group\/.+\/posts/)) {
+        // console.log('Group posts page detected');
+        inputManager.createProxy('.home-content .e1buxcrw1'); // 投稿タイトル
+        inputManager.createProxy('.home-content .e1azh1061[name=post]'); // 投稿本文
+      } else if (path.match(/^\/home\/group\/.+\/galleries/)) {
+        // console.log('Group gallery page detected');
+        inputManager.createProxy('.home-content .e18c1r7j39 > label .e1buxcrw1[name=name]'); // ギャラリータイトル
+        inputManager.createProxy('.home-content .e18c1r7j39 > label .e1buxcrw1[name=description]'); // ギャラリー本文
+        inputManager.createProxy('.home-content .e18c1r7j39 > .e18c1r7j43 .e1buxcrw1[name=name]'); // ギャラリータイトル（変更）
+        inputManager.createProxy(
+          '.home-content .e18c1r7j39 > .e18c1r7j43 .e1buxcrw1[name=description]',
+        ); // ギャラリー本文（変更）
+      }
+    }, 0);
   };
   // ページ遷移を監視
   new PageTransitionObserver(handlePageChange).observe();
