@@ -26,8 +26,8 @@ export class InputManager {
   deleteAll() {
     this.domChangeObserver.reset();
     this.proxies.forEach((proxy) => {
-      if (proxy.resizeObserver) {
-        proxy.resizeObserver.unobserve(proxy.target!);
+      if (proxy.resizeObserver && proxy.target) {
+        proxy.resizeObserver.unobserve(proxy.target);
       }
       if (proxy.layer) {
         proxy.layer.remove();
@@ -123,6 +123,8 @@ export class InputManager {
       backgroundLayer.className = '__MC__highlight-layer';
       refProxy.target.after(backgroundLayer);
       refProxy.layer = backgroundLayer;
+    } else {
+      refProxy.layer = nextSibling as HTMLElement;
     }
 
     // 画面リサイズを監視
@@ -156,7 +158,7 @@ export class InputManager {
     });
 
     // 初期値をバックグラウンドレイヤに設定
-    TextModifier.highlight(refProxy.layer!, refProxy.target.value);
+    TextModifier.highlight(refProxy.layer, refProxy.target.value);
   }
 
   private setStyle(refProxy: InputProxy) {
