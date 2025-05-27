@@ -2,7 +2,7 @@
   "$schema": "http://json.schemastore.org/chrome-manifest",
   "manifest_version": 3,
   "name": "もじちぇっかー👀",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "permissions": ["storage"],
   "host_permissions": ["https://github.com/*"],
   "content_scripts": [
