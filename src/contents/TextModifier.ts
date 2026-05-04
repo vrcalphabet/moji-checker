@@ -102,11 +102,12 @@ export class TextModifier {
   private static pushText(layer: HTMLElement, text: string, state: VariationType) {
     if (!text) return;
 
+    // textの末尾が改行の場合、無視されてしまうので置換する
+    if (text.charAt(-1) === '\n') {
+      text += '\u200B';
+    }
+
     if (state === VariationType.PRESERVE) {
-      // textが改行のみの場合、そのまま追加できないので置換する
-      if (text === '\n') {
-        text = ' \n';
-      }
       // 保持される場合は普通にテキストを追加
       const textNode = document.createTextNode(text);
       layer.append(textNode);
